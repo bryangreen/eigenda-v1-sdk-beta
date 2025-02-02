@@ -14,9 +14,23 @@ async function main() {
       // rpcUrl: 'https://custom.rpc.base.org'
     });
 
+    // Get or create an identifier
+    console.log('Checking for existing identifiers...');
+    let identifier;
+    const existingIdentifiers = await client.getIdentifiers();
+    
+    if (existingIdentifiers.length > 0) {
+      identifier = existingIdentifiers[0];
+      console.log('Using existing identifier:', Buffer.from(identifier).toString('hex'));
+    } else {
+      console.log('No existing identifier found. Creating new one...');
+      identifier = await client.createIdentifier();
+      console.log('Created new identifier:', Buffer.from(identifier).toString('hex'));
+    }
+
     // Upload data
     console.log('Uploading data...');
-    const uploadResult = await client.upload('Hello EigenDA!');
+    const uploadResult = await client.upload('Hello EigenDA!', identifier);
     console.log('Upload successful:', uploadResult);
 
     // Wait for confirmation

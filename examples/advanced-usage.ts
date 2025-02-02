@@ -1,6 +1,5 @@
 import { EigenDAClient } from '../src';
 import dotenv from 'dotenv';
-import { randomBytes } from 'crypto';
 
 // Load environment variables
 dotenv.config();
@@ -15,20 +14,35 @@ async function main() {
       creditsContractAddress: process.env.CREDITS_CONTRACT_ADDRESS
     });
 
-    // Create a new identifier
-    console.log('Creating identifier...');
-    const identifier = randomBytes(32);
-    console.log('Identifier:', identifier.toString('hex'));
-
-    // Top up credits
-    console.log('Topping up credits...');
-    const topupResult = await client.topupCredits(identifier, 0.1); // 0.1 ETH
-    console.log('Topup result:', topupResult);
+    // Get or create an identifier
+    console.log('Checking for existing identifiers...');
+    let identifier;
+    const existingIdentifiers = await client.getIdentifiers();
+    
+    if (existingIdentifiers.length > 0) {
+      identifier = existingIdentifiers[0];
+      console.log('Using existing identifier:', Buffer.from(identifier).toString('hex'));
+    } else {
+      console.log('No existing identifier found. Creating new one...');
+      identifier = await client.createIdentifier();
+      console.log('Created new identifier:', Buffer.from(identifier).toString('hex'));
+    }
 
     // Check balance
     console.log('Checking balance...');
     const balance = await client.getBalance(identifier);
     console.log('Balance:', balance, 'ETH');
+
+    // Top up credits if balance is low
+    if (balance < 0.001) {
+      console.log('Balance is low. Topping up credits...');
+      const topupResult = await client.topupCredits(identifier, 0.001); // 0.001 ETH
+      console.log('Topup result:', topupResult);
+      
+      // Verify new balance
+      const newBalance = await client.getBalance(identifier);
+      console.log('New balance:', newBalance, 'ETH');
+    }
 
     // Upload data with identifier
     console.log('Uploading data...');

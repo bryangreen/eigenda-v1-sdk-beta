@@ -11,10 +11,9 @@ npm install eigenda-sdk
 ## Limits and Costs
 
 - **Maximum Blob Size**: 2.5MB per blob
-- **Maximum Throughput**: 2.5MB/s
 - **Cost**: 0.015 ETH ($60) per GB
 
-Need higher limits or credits for student/indie projects? Contact us at gajesh@eigenlabs.org
+Need higher limits or credits for student/indie projects? Contact us
 
 ## Quick Start
 

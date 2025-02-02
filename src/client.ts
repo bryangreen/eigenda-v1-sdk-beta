@@ -21,6 +21,7 @@ import {
   validateConfig
 } from './utils/environment';
 import CreditsABI from './contracts/Credits.json';
+import { Log, LogDescription } from 'ethers';
 
 export class EigenDAClient {
   private apiUrl: string;
@@ -204,6 +205,56 @@ export class EigenDAClient {
       };
     } catch (error: any) {
       throw new Error(`Failed to top up credits: ${error.message}`);
+    }
+  }
+
+  async createIdentifier(): Promise<Uint8Array> {
+    try {
+      const tx = await this.creditsContract.createIdentifier();
+      const receipt = await tx.wait();
+
+      const event = receipt.logs
+        .map((log: Log) => this.creditsContract.interface.parseLog(log))
+        .find((event: LogDescription | null) => event?.name === 'IdentifierCreated');
+
+      if (event) {
+        // Convert the identifier to proper bytes32 format
+        const identifier = event.args.identifier;
+        // Remove '0x' prefix if present and ensure 32 bytes
+        const hexString = identifier.slice(0, 2) === '0x' ? identifier.slice(2) : identifier;
+        return ethers.getBytes('0x' + hexString.padStart(64, '0'));
+      }
+      throw new Error("No identifier in event logs");
+    } catch (error: any) {
+      throw new Error(`Failed to create identifier: ${error.message}`);
+    }
+  }
+
+  async getIdentifiers(): Promise<Uint8Array[]> {
+    try {
+      const count = await this.creditsContract.getUserIdentifierCount(this.wallet.address);
+      const identifiers = await Promise.all(
+        Array.from({ length: Number(count) }, (_, i) =>
+          this.creditsContract.getUserIdentifierAt(this.wallet.address, i)
+        )
+      );
+      // Convert each identifier to proper bytes32 format
+      return identifiers.map(id => {
+        const hexString = id.slice(0, 2) === '0x' ? id.slice(2) : id;
+        return ethers.getBytes('0x' + hexString.padStart(64, '0'));
+      });
+    } catch (error: any) {
+      throw new Error(`Failed to get identifiers: ${error.message}`);
+    }
+  }
+
+  async getIdentifierOwner(identifier: Uint8Array): Promise<string> {
+    try {
+      const hexString = Buffer.from(identifier).toString('hex');
+      const formattedIdentifier = ethers.hexlify(ethers.zeroPadValue('0x' + hexString, 32));
+      return await this.creditsContract.getIdentifierOwner(formattedIdentifier);
+    } catch (error: any) {
+      throw new Error(`Failed to get identifier owner: ${error.message}`);
     }
   }
 }
