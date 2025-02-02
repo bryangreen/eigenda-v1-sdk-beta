@@ -5,7 +5,9 @@ jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 // Default test values
-const TEST_PRIVATE_KEY = process.env.TEST_PRIVATE_KEY || '0x1234567890123456789012345678901234567890123456789012345678901234';
+const TEST_PRIVATE_KEY =
+  process.env.TEST_PRIVATE_KEY ||
+  '0x1234567890123456789012345678901234567890123456789012345678901234';
 const TEST_API_URL = process.env.TEST_API_URL || 'https://test-agent-proxy-api.eigenda.xyz';
 const TEST_RPC_URL = process.env.TEST_RPC_URL || 'https://mainnet.base.org';
 
@@ -30,8 +32,9 @@ describe('EigenDAClient', () => {
     });
 
     it('should throw ConfigurationError with invalid private key', () => {
-      expect(() => new EigenDAClient({ ...mockConfig, privateKey: 'invalid' }))
-        .toThrow(ConfigurationError);
+      expect(() => new EigenDAClient({ ...mockConfig, privateKey: 'invalid' })).toThrow(
+        ConfigurationError
+      );
     });
 
     it('should throw ConfigurationError when no private key provided', () => {
@@ -53,10 +56,10 @@ describe('EigenDAClient', () => {
 
     it('should upload content successfully', async () => {
       mockedAxios.post.mockResolvedValueOnce({ data: mockUploadResponse });
-      
+
       const client = new EigenDAClient(mockConfig);
       const result = await client.upload('test content');
-      
+
       expect(result).toEqual(mockUploadResponse);
       expect(mockedAxios.post).toHaveBeenCalledWith(
         expect.stringContaining('/upload'),
@@ -71,7 +74,7 @@ describe('EigenDAClient', () => {
 
     it('should handle upload errors', async () => {
       const errorMessage = 'Network error';
-      mockedAxios.post.mockRejectedValueOnce({ 
+      mockedAxios.post.mockRejectedValueOnce({
         message: errorMessage,
         response: { data: { error: errorMessage } }
       });
@@ -89,19 +92,17 @@ describe('EigenDAClient', () => {
 
     it('should get status successfully', async () => {
       mockedAxios.get.mockResolvedValueOnce({ data: mockStatusResponse });
-      
+
       const client = new EigenDAClient(mockConfig);
       const result = await client.getStatus('test-job-id');
-      
+
       expect(result).toEqual(mockStatusResponse);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringContaining('/status/test-job-id')
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringContaining('/status/test-job-id'));
     });
 
     it('should handle status check errors', async () => {
       const errorMessage = 'Network error';
-      mockedAxios.get.mockRejectedValueOnce({ 
+      mockedAxios.get.mockRejectedValueOnce({
         message: errorMessage,
         response: { data: { error: errorMessage } }
       });
@@ -119,10 +120,10 @@ describe('EigenDAClient', () => {
 
     it('should retrieve content successfully', async () => {
       mockedAxios.post.mockResolvedValueOnce(mockRetrieveResponse);
-      
+
       const client = new EigenDAClient(mockConfig);
       const result = await client.retrieve({ jobId: 'test-job-id' });
-      
+
       expect(result).toEqual(mockContent);
       expect(mockedAxios.post).toHaveBeenCalledWith(
         expect.stringContaining('/retrieve'),
@@ -133,7 +134,7 @@ describe('EigenDAClient', () => {
 
     it('should handle retrieval errors', async () => {
       const errorMessage = 'Network error';
-      mockedAxios.post.mockRejectedValueOnce({ 
+      mockedAxios.post.mockRejectedValueOnce({
         message: errorMessage,
         response: { data: { error: errorMessage } }
       });
@@ -145,10 +146,10 @@ describe('EigenDAClient', () => {
     it('should handle non-JSON responses', async () => {
       const binaryData = Buffer.from([1, 2, 3, 4]);
       mockedAxios.post.mockResolvedValueOnce({ data: binaryData });
-      
+
       const client = new EigenDAClient(mockConfig);
       const result = await client.retrieve({ jobId: 'test-job-id' });
-      
+
       expect(result).toBeInstanceOf(Uint8Array);
     });
   });
