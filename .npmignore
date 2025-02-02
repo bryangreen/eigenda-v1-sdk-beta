@@ -1,0 +1,25 @@
+# Source
+src/
+examples/
+tests/
+
+# Development files
+.github/
+.vscode/
+.idea/
+.git/
+.gitignore
+.npmignore
+.env*
+jest.config.js
+tsconfig.json
+.eslintrc.js
+.prettierrc
+
+# Build artifacts
+coverage/
+*.log
+*.tsbuildinfo
+
+# Keep dist folder
+!dist/ 

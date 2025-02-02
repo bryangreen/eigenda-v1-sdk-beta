@@ -17,7 +17,8 @@
     "clean": "rm -rf dist",
     "example:basic": "ts-node examples/basic-usage.ts",
     "example:advanced": "ts-node examples/advanced-usage.ts",
-    "docs": "typedoc --out docs src/index.ts"
+    "docs": "typedoc --out docs src/index.ts",
+    "release": "./scripts/release.sh"
   },
   "repository": {
     "type": "git",
