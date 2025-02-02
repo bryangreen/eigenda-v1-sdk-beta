@@ -5,7 +5,7 @@ jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 // Default test values
-const TEST_PRIVATE_KEY = process.env.TEST_PRIVATE_KEY || '';
+const TEST_PRIVATE_KEY = process.env.TEST_PRIVATE_KEY || '0x1234567890123456789012345678901234567890123456789012345678901234';
 const TEST_API_URL = process.env.TEST_API_URL || 'https://test-agent-proxy-api.eigenda.xyz';
 const TEST_RPC_URL = process.env.TEST_RPC_URL || 'https://mainnet.base.org';
 
@@ -35,10 +35,13 @@ describe('EigenDAClient', () => {
     });
 
     it('should throw ConfigurationError when no private key provided', () => {
-      expect(() => new EigenDAClient({ 
-        apiUrl: TEST_API_URL,
-        rpcUrl: TEST_RPC_URL
-      })).toThrow(ConfigurationError);
+      expect(
+        () =>
+          new EigenDAClient({
+            apiUrl: TEST_API_URL,
+            rpcUrl: TEST_RPC_URL
+          })
+      ).toThrow(ConfigurationError);
     });
   });
 
@@ -74,9 +77,7 @@ describe('EigenDAClient', () => {
       });
 
       const client = new EigenDAClient(mockConfig);
-      await expect(client.upload('test content'))
-        .rejects
-        .toThrow(UploadError);
+      await expect(client.upload('test content')).rejects.toThrow(UploadError);
     });
   });
 
@@ -106,9 +107,7 @@ describe('EigenDAClient', () => {
       });
 
       const client = new EigenDAClient(mockConfig);
-      await expect(client.getStatus('test-job-id'))
-        .rejects
-        .toThrow(StatusError);
+      await expect(client.getStatus('test-job-id')).rejects.toThrow(StatusError);
     });
   });
 
@@ -140,9 +139,7 @@ describe('EigenDAClient', () => {
       });
 
       const client = new EigenDAClient(mockConfig);
-      await expect(client.retrieve({ jobId: 'test-job-id' }))
-        .rejects
-        .toThrow(RetrieveError);
+      await expect(client.retrieve({ jobId: 'test-job-id' })).rejects.toThrow(RetrieveError);
     });
 
     it('should handle non-JSON responses', async () => {
