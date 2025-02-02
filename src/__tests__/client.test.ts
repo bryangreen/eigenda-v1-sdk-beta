@@ -11,11 +11,14 @@ jest.mock('ethers', () => {
   return {
     ...originalModule,
     Contract: jest.fn().mockImplementation(() => ({
-      createIdentifier: jest.fn().mockImplementation(() => Promise.resolve({
-        wait: () => Promise.resolve({
-          logs: []
+      createIdentifier: jest.fn().mockImplementation(() =>
+        Promise.resolve({
+          wait: () =>
+            Promise.resolve({
+              logs: []
+            })
         })
-      })),
+      ),
       getUserIdentifierCount: jest.fn().mockResolvedValue(0),
       getUserIdentifierAt: jest.fn().mockResolvedValue('0x'),
       getIdentifierOwner: jest.fn().mockResolvedValue('0x'),

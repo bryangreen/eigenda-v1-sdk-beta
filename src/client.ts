@@ -224,7 +224,7 @@ export class EigenDAClient {
         const hexString = identifier.slice(0, 2) === '0x' ? identifier.slice(2) : identifier;
         return ethers.getBytes('0x' + hexString.padStart(64, '0'));
       }
-      throw new Error("No identifier in event logs");
+      throw new Error('No identifier in event logs');
     } catch (error: any) {
       throw new Error(`Failed to create identifier: ${error.message}`);
     }
@@ -239,7 +239,7 @@ export class EigenDAClient {
         )
       );
       // Convert each identifier to proper bytes32 format
-      return identifiers.map(id => {
+      return identifiers.map((id) => {
         const hexString = id.slice(0, 2) === '0x' ? id.slice(2) : id;
         return ethers.getBytes('0x' + hexString.padStart(64, '0'));
       });
