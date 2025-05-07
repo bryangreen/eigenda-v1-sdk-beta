@@ -1,5 +1,5 @@
 export * from './types';
-export * from './client';
+export * from './clientv1';
 
 // Export a default function to create a client instance
-export { EigenDAv1Client as default } from './client';
+export { EigenDAv1Client as default } from './clientv1';
