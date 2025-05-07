@@ -1,4 +1,4 @@
-import { EigenDAClient } from '../src';
+import { EigenDAv1Client } from '../src';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -7,7 +7,7 @@ dotenv.config();
 async function main() {
   try {
     // Initialize client with custom configuration
-    const client = new EigenDAClient({
+    const client = new EigenDAv1Client({
       privateKey: process.env.PRIVATE_KEY,
       apiUrl: process.env.API_URL,
       rpcUrl: process.env.BASE_RPC_URL,

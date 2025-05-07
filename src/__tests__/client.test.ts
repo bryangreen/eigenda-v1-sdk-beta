@@ -1,4 +1,4 @@
-import { EigenDAClient, ConfigurationError, UploadError, StatusError, RetrieveError } from '../';
+import { EigenDAv1Client, ConfigurationError, UploadError, StatusError, RetrieveError } from '../';
 import axios from 'axios';
 import { Contract } from 'ethers';
 
@@ -50,7 +50,7 @@ type MockedContract = {
   };
 };
 
-describe('EigenDAClient', () => {
+describe('EigenDAv1Client', () => {
   const mockConfig = {
     privateKey: TEST_PRIVATE_KEY,
     apiUrl: TEST_API_URL,
@@ -66,12 +66,12 @@ describe('EigenDAClient', () => {
 
   describe('constructor', () => {
     it('should create instance with valid config', () => {
-      const client = new EigenDAClient(mockConfig);
-      expect(client).toBeInstanceOf(EigenDAClient);
+      const client = new EigenDAv1Client(mockConfig);
+      expect(client).toBeInstanceOf(EigenDAv1Client);
     });
 
     it('should throw ConfigurationError with invalid private key', () => {
-      expect(() => new EigenDAClient({ ...mockConfig, privateKey: 'invalid' })).toThrow(
+      expect(() => new EigenDAv1Client({ ...mockConfig, privateKey: 'invalid' })).toThrow(
         ConfigurationError
       );
     });
@@ -79,7 +79,7 @@ describe('EigenDAClient', () => {
     it('should throw ConfigurationError when no private key provided', () => {
       expect(
         () =>
-          new EigenDAClient({
+          new EigenDAv1Client({
             apiUrl: TEST_API_URL,
             rpcUrl: TEST_RPC_URL
           })
@@ -87,8 +87,8 @@ describe('EigenDAClient', () => {
     });
 
     it('should use default values when not provided', () => {
-      const client = new EigenDAClient({ privateKey: TEST_PRIVATE_KEY });
-      expect(client).toBeInstanceOf(EigenDAClient);
+      const client = new EigenDAv1Client({ privateKey: TEST_PRIVATE_KEY });
+      expect(client).toBeInstanceOf(EigenDAv1Client);
     });
   });
 
@@ -101,7 +101,7 @@ describe('EigenDAClient', () => {
     it('should upload content successfully', async () => {
       mockedAxios.post.mockResolvedValueOnce({ data: mockUploadResponse });
 
-      const client = new EigenDAClient(mockConfig);
+      const client = new EigenDAv1Client(mockConfig);
       const result = await client.upload('test content');
 
       expect(result).toEqual(mockUploadResponse);
@@ -123,7 +123,7 @@ describe('EigenDAClient', () => {
         response: { data: { error: errorMessage } }
       });
 
-      const client = new EigenDAClient(mockConfig);
+      const client = new EigenDAv1Client(mockConfig);
       await expect(client.upload('test content')).rejects.toThrow(UploadError);
     });
 
@@ -131,7 +131,7 @@ describe('EigenDAClient', () => {
       mockedAxios.post.mockResolvedValueOnce({ data: mockUploadResponse });
       const identifier = new Uint8Array([1, 2, 3, 4]);
 
-      const client = new EigenDAClient(mockConfig);
+      const client = new EigenDAv1Client(mockConfig);
       const result = await client.upload('test content', identifier);
 
       expect(result).toEqual(mockUploadResponse);
@@ -153,7 +153,7 @@ describe('EigenDAClient', () => {
     it('should retrieve content successfully', async () => {
       mockedAxios.post.mockResolvedValueOnce(mockRetrieveResponse);
 
-      const client = new EigenDAClient(mockConfig);
+      const client = new EigenDAv1Client(mockConfig);
       const result = await client.retrieve({ jobId: 'test-job-id' });
 
       expect(result).toEqual(mockContent);
@@ -167,7 +167,7 @@ describe('EigenDAClient', () => {
     it('should retrieve with requestId', async () => {
       mockedAxios.post.mockResolvedValueOnce(mockRetrieveResponse);
 
-      const client = new EigenDAClient(mockConfig);
+      const client = new EigenDAv1Client(mockConfig);
       await client.retrieve({ requestId: 'test-request-id' });
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
@@ -180,7 +180,7 @@ describe('EigenDAClient', () => {
     it('should retrieve with blob info', async () => {
       mockedAxios.post.mockResolvedValueOnce(mockRetrieveResponse);
 
-      const client = new EigenDAClient(mockConfig);
+      const client = new EigenDAv1Client(mockConfig);
       await client.retrieve({
         batchHeaderHash: 'test-hash',
         blobIndex: 0
@@ -203,7 +203,7 @@ describe('EigenDAClient', () => {
         response: { data: { error: errorMessage } }
       });
 
-      const client = new EigenDAClient(mockConfig);
+      const client = new EigenDAv1Client(mockConfig);
       await expect(client.retrieve({ jobId: 'test-job-id' })).rejects.toThrow(RetrieveError);
     });
 
@@ -211,14 +211,14 @@ describe('EigenDAClient', () => {
       const binaryData = Buffer.from([1, 2, 3, 4]);
       mockedAxios.post.mockResolvedValueOnce({ data: binaryData });
 
-      const client = new EigenDAClient(mockConfig);
+      const client = new EigenDAv1Client(mockConfig);
       const result = await client.retrieve({ jobId: 'test-job-id' });
 
       expect(result).toBeInstanceOf(Uint8Array);
     });
 
     it('should throw error when no valid retrieval options provided', async () => {
-      const client = new EigenDAClient(mockConfig);
+      const client = new EigenDAv1Client(mockConfig);
       await expect(client.retrieve({})).rejects.toThrow(RetrieveError);
     });
   });

@@ -23,7 +23,7 @@ import {
 import CreditsABI from './contracts/Credits.json';
 import { Log, LogDescription } from 'ethers';
 
-export class EigenDAClient {
+export class EigenDAv1Client {
   private apiUrl: string;
   private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet;
