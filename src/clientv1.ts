@@ -1,3 +1,4 @@
+
 import { ethers } from 'ethers';
 import axios from 'axios';
 import { randomBytes } from 'crypto';
@@ -29,20 +30,21 @@ export class EigenDAv1Client {
   private wallet: ethers.Wallet;
   private creditsContract: ethers.Contract;
 
+  /**
+   * Creates an instance of EigenDAv1Client.
+   * @param {EigenDAConfig} [config] - Optional configuration object for the client
+   * @throws {ConfigurationError} When configuration validation fails
+   */
   constructor(config?: EigenDAConfig) {
-    // Validate configuration
     const configErrors = validateConfig(config || {});
     if (configErrors.length > 0) {
       throw new ConfigurationError(`Invalid configuration: ${configErrors.join(', ')}`);
     }
 
     this.apiUrl = (config?.apiUrl || process.env.API_URL || DEFAULT_API_URL).replace(/\/$/, '');
-
-    // Setup provider
     const rpcUrl = config?.rpcUrl || process.env.BASE_RPC_URL || DEFAULT_RPC_URL;
     this.provider = new ethers.JsonRpcProvider(rpcUrl);
 
-    // Setup wallet
     const privateKey = config?.privateKey || process.env.EIGENDA_PRIVATE_KEY;
     if (!privateKey) {
       throw new ConfigurationError(
@@ -52,7 +54,6 @@ export class EigenDAv1Client {
     const normalizedPrivateKey = privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`;
     this.wallet = new ethers.Wallet(normalizedPrivateKey, this.provider);
 
-    // Setup contract
     const creditsContractAddress =
       config?.creditsContractAddress ||
       process.env.CREDITS_CONTRACT_ADDRESS ||
@@ -60,6 +61,12 @@ export class EigenDAv1Client {
     this.creditsContract = new ethers.Contract(creditsContractAddress, CreditsABI.abi, this.wallet);
   }
 
+  /**
+   * Signs request data with the wallet's private key.
+   * @param {any} requestData - The data to be signed
+   * @returns {Promise<string>} The signature
+   * @private
+   */
   private async signRequest(requestData: any): Promise<string> {
     const dataToSign = {
       content: requestData.content,
@@ -69,6 +76,13 @@ export class EigenDAv1Client {
     return await this.wallet.signMessage(message);
   }
 
+  /**
+   * Uploads content to EigenDA.
+   * @param {string} content - The content to upload
+   * @param {Uint8Array} [identifier] - Optional identifier for the upload
+   * @returns {Promise<UploadResponse>} The upload response
+   * @throws {UploadError} When upload fails
+   */
   async upload(content: string, identifier?: Uint8Array): Promise<UploadResponse> {
     try {
       const salt = randomBytes(32).toString('hex');
@@ -98,6 +112,12 @@ export class EigenDAv1Client {
     }
   }
 
+  /**
+   * Gets the status of a job.
+   * @param {string} jobId - The ID of the job to check
+   * @returns {Promise<StatusResponse>} The status response
+   * @throws {StatusError} When status check fails
+   */
   async getStatus(jobId: string): Promise<StatusResponse> {
     try {
       const response = await axios.get<StatusResponse>(`${this.apiUrl}/status/${jobId}`);
@@ -107,6 +127,16 @@ export class EigenDAv1Client {
     }
   }
 
+  /**
+   * Waits for a job to reach a target status.
+   * @param {string} jobId - The ID of the job to wait for
+   * @param {'CONFIRMED' | 'FINALIZED'} [targetStatus='CONFIRMED'] - The target status to wait for
+   * @param {number} [maxChecks=MAX_STATUS_CHECKS] - Maximum number of status checks
+   * @param {number} [checkInterval=STATUS_CHECK_INTERVAL] - Interval between checks in seconds
+   * @param {number} [initialDelay=INITIAL_RETRIEVAL_DELAY] - Initial delay before first check in seconds
+   * @returns {Promise<StatusResponse>} The final status response
+   * @throws {StatusError} When status check fails or times out
+   */
   async waitForStatus(
     jobId: string,
     targetStatus: 'CONFIRMED' | 'FINALIZED' = 'CONFIRMED',
@@ -134,6 +164,12 @@ export class EigenDAv1Client {
     throw new StatusError(`Timeout waiting for status ${targetStatus} after ${maxChecks} checks`);
   }
 
+  /**
+   * Retrieves data from EigenDA.
+   * @param {RetrieveOptions} options - Options for retrieving data
+   * @returns {Promise<any>} The retrieved data
+   * @throws {RetrieveError} When retrieval fails
+   */
   async retrieve(options: RetrieveOptions): Promise<any> {
     try {
       const { jobId, requestId, batchHeaderHash, blobIndex, waitForCompletion = false } = options;
@@ -176,6 +212,12 @@ export class EigenDAv1Client {
     }
   }
 
+  /**
+   * Gets the balance for a given identifier.
+   * @param {Uint8Array} identifier - The identifier to check balance for
+   * @returns {Promise<number>} The balance in ETH
+   * @throws {Error} When balance check fails
+   */
   async getBalance(identifier: Uint8Array): Promise<number> {
     try {
       const hexString = Buffer.from(identifier).toString('hex');
@@ -187,6 +229,13 @@ export class EigenDAv1Client {
     }
   }
 
+  /**
+   * Tops up credits for a given identifier.
+   * @param {Uint8Array} identifier - The identifier to top up credits for
+   * @param {number} amountEth - Amount of ETH to top up
+   * @returns {Promise<{transactionHash: string, status: string}>} Transaction details
+   * @throws {Error} When top up fails
+   */
   async topupCredits(
     identifier: Uint8Array,
     amountEth: number
@@ -208,6 +257,11 @@ export class EigenDAv1Client {
     }
   }
 
+  /**
+   * Creates a new identifier.
+   * @returns {Promise<Uint8Array>} The newly created identifier
+   * @throws {Error} When identifier creation fails
+   */
   async createIdentifier(): Promise<Uint8Array> {
     try {
       const tx = await this.creditsContract.createIdentifier();
@@ -218,9 +272,7 @@ export class EigenDAv1Client {
         .find((event: LogDescription | null) => event?.name === 'IdentifierCreated');
 
       if (event) {
-        // Convert the identifier to proper bytes32 format
         const identifier = event.args.identifier;
-        // Remove '0x' prefix if present and ensure 32 bytes
         const hexString = identifier.slice(0, 2) === '0x' ? identifier.slice(2) : identifier;
         return ethers.getBytes('0x' + hexString.padStart(64, '0'));
       }
@@ -230,6 +282,11 @@ export class EigenDAv1Client {
     }
   }
 
+  /**
+   * Gets all identifiers for the current wallet address.
+   * @returns {Promise<Uint8Array[]>} Array of identifiers
+   * @throws {Error} When getting identifiers fails
+   */
   async getIdentifiers(): Promise<Uint8Array[]> {
     try {
       const count = await this.creditsContract.getUserIdentifierCount(this.wallet.address);
@@ -238,7 +295,6 @@ export class EigenDAv1Client {
           this.creditsContract.getUserIdentifierAt(this.wallet.address, i)
         )
       );
-      // Convert each identifier to proper bytes32 format
       return identifiers.map((id) => {
         const hexString = id.slice(0, 2) === '0x' ? id.slice(2) : id;
         return ethers.getBytes('0x' + hexString.padStart(64, '0'));
@@ -248,6 +304,12 @@ export class EigenDAv1Client {
     }
   }
 
+  /**
+   * Gets the owner of a given identifier.
+   * @param {Uint8Array} identifier - The identifier to check ownership for
+   * @returns {Promise<string>} The owner's address
+   * @throws {Error} When getting owner fails
+   */
   async getIdentifierOwner(identifier: Uint8Array): Promise<string> {
     try {
       const hexString = Buffer.from(identifier).toString('hex');

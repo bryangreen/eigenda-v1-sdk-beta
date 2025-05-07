@@ -1,3 +1,4 @@
+
 export const DEFAULT_API_URL = 'https://test-agent-proxy-api.eigenda.xyz';
 export const DEFAULT_RPC_URL = 'https://mainnet.base.org';
 export const DEFAULT_CREDITS_CONTRACT_ADDRESS = '0x0CC001F1bDe9cd129092d4d24D935DB985Ce42A9';
@@ -6,6 +7,15 @@ export const MAX_STATUS_CHECKS = 60; // Maximum number of status checks (10 minu
 export const STATUS_CHECK_INTERVAL = 10; // Seconds between status checks
 export const INITIAL_RETRIEVAL_DELAY = 300; // 5 minutes initial delay before first retrieval attempt
 
+/**
+ * Validates the EigenDA client configuration.
+ * @param {Object} config - The configuration object to validate
+ * @param {string} [config.apiUrl] - The API URL
+ * @param {string} [config.rpcUrl] - The RPC URL
+ * @param {string} [config.privateKey] - The private key
+ * @param {string} [config.creditsContractAddress] - The credits contract address
+ * @returns {string[]} Array of validation error messages
+ */
 export const validateConfig = (config: {
   apiUrl?: string;
   rpcUrl?: string;
@@ -33,6 +43,12 @@ export const validateConfig = (config: {
   return errors;
 };
 
+/**
+ * Validates if a string is a valid URL.
+ * @param {string} url - The URL to validate
+ * @returns {boolean} True if URL is valid
+ * @private
+ */
 const isValidUrl = (url: string): boolean => {
   try {
     new URL(url);
@@ -42,11 +58,23 @@ const isValidUrl = (url: string): boolean => {
   }
 };
 
+/**
+ * Validates if a string is a valid private key.
+ * @param {string} key - The private key to validate
+ * @returns {boolean} True if private key is valid
+ * @private
+ */
 const isValidPrivateKey = (key: string): boolean => {
   const normalizedKey = key.startsWith('0x') ? key.slice(2) : key;
   return /^[0-9a-fA-F]{64}$/.test(normalizedKey);
 };
 
+/**
+ * Validates if a string is a valid Ethereum address.
+ * @param {string} address - The address to validate
+ * @returns {boolean} True if address is valid
+ * @private
+ */
 const isValidAddress = (address: string): boolean => {
   return /^0x[0-9a-fA-F]{40}$/.test(address);
 };
