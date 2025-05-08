@@ -1,18 +1,17 @@
-import { Log, LogDescription } from 'ethers';
-import CreditsABI from '../../abis/v1/Credits.json';
-import { ethers } from 'ethers';
-import { EigenDAConfig, ConfigurationError, IEigenCredits } from '../types';
-import {
-  DEFAULT_CREDITS_CONTRACT_ADDRESS,
-  DEFAULT_RPC_URL,
-  validateConfig
-} from '../utils/environment';
 
+/**
+ * Class for managing EigenDA credits and identifiers
+ */
 export class EigenCredits implements IEigenCredits {
   private creditsContract: ethers.Contract;
   private wallet: ethers.Wallet;
   private provider: ethers.JsonRpcProvider;
 
+  /**
+   * Creates an instance of EigenCredits
+   * @param config - Configuration object for the client
+   * @throws {ConfigurationError} When configuration is invalid
+   */
   constructor(config?: EigenDAConfig) {
     const configErrors = validateConfig(config || {});
     if (configErrors.length > 0) {
@@ -42,6 +41,12 @@ export class EigenCredits implements IEigenCredits {
     this.creditsContract = new ethers.Contract(creditsContractAddress, CreditsABI.abi, this.wallet);
   }
 
+  /**
+   * Gets the balance for a given identifier
+   * @param identifier - The identifier to check balance for
+   * @returns The balance in ETH
+   * @throws {Error} If balance check fails
+   */
   async getBalance(identifier: Uint8Array): Promise<number> {
     try {
       const hexString = Buffer.from(identifier).toString('hex');
@@ -53,6 +58,13 @@ export class EigenCredits implements IEigenCredits {
     }
   }
 
+  /**
+   * Tops up credits for an identifier
+   * @param identifier - The identifier to top up
+   * @param amountEth - Amount of ETH to top up
+   * @returns Transaction details
+   * @throws {Error} If top up fails
+   */
   async topupCredits(
     identifier: Uint8Array,
     amountEth: number
@@ -74,6 +86,11 @@ export class EigenCredits implements IEigenCredits {
     }
   }
 
+  /**
+   * Creates a new identifier
+   * @returns The created identifier
+   * @throws {Error} If identifier creation fails
+   */
   async createIdentifier(): Promise<Uint8Array> {
     try {
       const tx = await this.creditsContract.createIdentifier();
@@ -94,6 +111,11 @@ export class EigenCredits implements IEigenCredits {
     }
   }
 
+  /**
+   * Gets all identifiers for the current wallet
+   * @returns Array of identifiers
+   * @throws {Error} If fetching identifiers fails
+   */
   async getIdentifiers(): Promise<Uint8Array[]> {
     try {
       const count = await this.creditsContract.getUserIdentifierCount(this.wallet.address);
@@ -111,6 +133,12 @@ export class EigenCredits implements IEigenCredits {
     }
   }
 
+  /**
+   * Gets the owner of an identifier
+   * @param identifier - The identifier to check ownership for
+   * @returns The owner's address
+   * @throws {Error} If fetching owner fails
+   */
   async getIdentifierOwner(identifier: Uint8Array): Promise<string> {
     try {
       const hexString = Buffer.from(identifier).toString('hex');

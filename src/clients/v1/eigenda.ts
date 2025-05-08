@@ -1,31 +1,17 @@
-import { ethers } from 'ethers';
-import axios from 'axios';
-import { randomBytes } from 'crypto';
-import {
-  EigenDAConfig,
-  UploadResponse,
-  StatusResponse,
-  RetrieveOptions,
-  UploadError,
-  RetrieveError,
-  StatusError,
-  ConfigurationError,
-  IEigenDAClient
-} from '../types';
-import {
-  DEFAULT_API_URL,
-  DEFAULT_RPC_URL,
-  MAX_STATUS_CHECKS,
-  STATUS_CHECK_INTERVAL,
-  INITIAL_RETRIEVAL_DELAY,
-  validateConfig
-} from '../utils/environment';
 
+/**
+ * Client for interacting with EigenDA v1 API
+ */
 export class EigenDAv1Client implements IEigenDAClient {
   private apiUrl: string;
   private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet;
 
+  /**
+   * Creates an instance of EigenDAv1Client
+   * @param config - Configuration object for the client
+   * @throws {ConfigurationError} When configuration is invalid
+   */
   constructor(config?: EigenDAConfig) {
     const configErrors = validateConfig(config || {});
     if (configErrors.length > 0) {
@@ -50,6 +36,11 @@ export class EigenDAv1Client implements IEigenDAClient {
     }
   }
 
+  /**
+   * Signs a request payload
+   * @param requestData - Data to sign
+   * @returns Signature
+   */
   private async signRequest(requestData: any): Promise<string> {
     const dataToSign = {
       content: requestData.content,
@@ -59,6 +50,13 @@ export class EigenDAv1Client implements IEigenDAClient {
     return await this.wallet.signMessage(message);
   }
 
+  /**
+   * Uploads content to EigenDA
+   * @param content - Content to upload
+   * @param identifier - Optional identifier for the upload
+   * @returns Upload response
+   * @throws {UploadError} When upload fails
+   */
   async upload(content: string, identifier?: Uint8Array): Promise<UploadResponse> {
     try {
       const salt = randomBytes(32).toString('hex');
@@ -88,6 +86,12 @@ export class EigenDAv1Client implements IEigenDAClient {
     }
   }
 
+  /**
+   * Gets the status of an upload
+   * @param jobId - ID of the job to check
+   * @returns Status response
+   * @throws {StatusError} When status check fails
+   */
   async getStatus(jobId: string): Promise<StatusResponse> {
     try {
       const response = await axios.get<StatusResponse>(`${this.apiUrl}/status/${jobId}`);
@@ -97,6 +101,16 @@ export class EigenDAv1Client implements IEigenDAClient {
     }
   }
 
+  /**
+   * Waits for a specific status
+   * @param jobId - ID of the job to check
+   * @param targetStatus - Target status to wait for
+   * @param maxChecks - Maximum number of status checks
+   * @param checkInterval - Interval between checks in seconds
+   * @param initialDelay - Initial delay before first check in seconds
+   * @returns Status response
+   * @throws {StatusError} When status check fails or times out
+   */
   async waitForStatus(
     jobId: string,
     targetStatus: 'CONFIRMED' | 'FINALIZED' = 'CONFIRMED',
@@ -124,6 +138,12 @@ export class EigenDAv1Client implements IEigenDAClient {
     throw new StatusError(`Timeout waiting for status ${targetStatus} after ${maxChecks} checks`);
   }
 
+  /**
+   * Retrieves content from EigenDA
+   * @param options - Retrieval options
+   * @returns Retrieved content
+   * @throws {RetrieveError} When retrieval fails
+   */
   async retrieve(options: RetrieveOptions): Promise<any> {
     try {
       const { jobId, requestId, batchHeaderHash, blobIndex, waitForCompletion = false } = options;
