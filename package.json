@@ -16,7 +16,7 @@
     "lint:fix": "eslint 'src/**/*.{js,ts}' --fix",
     "format": "prettier --write \"src/**/*.ts\" \"examples/**/*.ts\"",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
+    "prepublishOnly": "npm run clean && npm run build && npm run test && npm run lint",
     "clean": "rm -rf dist",
     "example:basic": "ts-node examples/basic-usage.ts",
     "example:advanced": "ts-node examples/advanced-usage.ts",
