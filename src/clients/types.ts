@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+
 export interface IEigenDAClient {
   /**
    * Uploads content to EigenDA.
@@ -50,9 +52,7 @@ export interface EigenDAConfig {
   apiUrl?: string;
   rpcUrl?: string;
   privateKey?: string;
-}
-
-export interface EigenCreditsConfig {
+  wallet?: ethers.Wallet;
   creditsContractAddress?: string;
 }
 

@@ -1,15 +1,44 @@
-import { ethers } from 'ethers';
 import { Log, LogDescription } from 'ethers';
 import CreditsABI from '../../abis/v1/Credits.json';
-import { EigenCreditsConfig, IEigenCredits } from '../types';
-import { DEFAULT_CREDITS_CONTRACT_ADDRESS } from '../utils/environment';
+import { ethers } from 'ethers';
+import { EigenDAConfig, ConfigurationError, IEigenCredits } from '../types';
+import {
+  DEFAULT_CREDITS_CONTRACT_ADDRESS,
+  DEFAULT_RPC_URL,
+  validateConfig
+} from '../utils/environment';
 
 export class EigenCredits implements IEigenCredits {
   private creditsContract: ethers.Contract;
   private wallet: ethers.Wallet;
+  private provider: ethers.JsonRpcProvider;
 
-  constructor(config: EigenCreditsConfig, wallet: ethers.Wallet) {
-    this.wallet = wallet;
+  /**
+   * Creates an instance of EigenDAv1Client.
+   * @param {EigenDAConfig} [config] - Optional configuration object for the client
+   * @throws {ConfigurationError} When configuration validation fails
+   */
+  constructor(config?: EigenDAConfig) {
+    const configErrors = validateConfig(config || {});
+    if (configErrors.length > 0) {
+      throw new ConfigurationError(`Invalid configuration: ${configErrors.join(', ')}`);
+    }
+
+    const rpcUrl = config?.rpcUrl || process.env.BASE_RPC_URL || DEFAULT_RPC_URL;
+    this.provider = new ethers.JsonRpcProvider(rpcUrl);
+
+    if (config?.wallet) {
+      this.wallet = config.wallet;
+    } else {
+      const privateKey = config?.privateKey || process.env.EIGENDA_PRIVATE_KEY;
+      if (!privateKey) {
+        throw new ConfigurationError(
+          'Private key not provided and EIGENDA_PRIVATE_KEY not set in environment'
+        );
+      }
+      const normalizedPrivateKey = privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`;
+      this.wallet = new ethers.Wallet(normalizedPrivateKey, this.provider);
+    }
 
     const creditsContractAddress =
       config?.creditsContractAddress ||

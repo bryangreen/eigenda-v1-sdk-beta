@@ -41,14 +41,18 @@ export class EigenDAv1Client implements IEigenDAClient {
     const rpcUrl = config?.rpcUrl || process.env.BASE_RPC_URL || DEFAULT_RPC_URL;
     this.provider = new ethers.JsonRpcProvider(rpcUrl);
 
-    const privateKey = config?.privateKey || process.env.EIGENDA_PRIVATE_KEY;
-    if (!privateKey) {
-      throw new ConfigurationError(
-        'Private key not provided and EIGENDA_PRIVATE_KEY not set in environment'
-      );
+    if (config?.wallet) {
+      this.wallet = config.wallet;
+    } else {
+      const privateKey = config?.privateKey || process.env.EIGENDA_PRIVATE_KEY;
+      if (!privateKey) {
+        throw new ConfigurationError(
+          'Private key not provided and EIGENDA_PRIVATE_KEY not set in environment'
+        );
+      }
+      const normalizedPrivateKey = privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`;
+      this.wallet = new ethers.Wallet(normalizedPrivateKey, this.provider);
     }
-    const normalizedPrivateKey = privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`;
-    this.wallet = new ethers.Wallet(normalizedPrivateKey, this.provider);
   }
 
   /**
