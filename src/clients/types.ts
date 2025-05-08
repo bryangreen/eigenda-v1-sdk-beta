@@ -1,24 +1,24 @@
 export interface IEigenDAClient {
   /**
    * Uploads content to EigenDA.
-   * @param content The content to upload
-   * @param identifier Optional identifier for the upload
+   * @param content Content to upload
+   * @param identifier Optional identifier for upload
    */
   upload(content: string, identifier?: Uint8Array): Promise<UploadResponse>;
 
   /**
    * Gets the status of a job.
-   * @param jobId The ID of the job to check
+   * @param jobId Job ID to check
    */
   getStatus(jobId: string): Promise<StatusResponse>;
 
   /**
    * Waits for a job to reach a target status.
-   * @param jobId The ID of the job to wait for
-   * @param targetStatus The target status to wait for
-   * @param maxChecks Maximum number of status checks
-   * @param checkInterval Interval between checks in seconds
-   * @param initialDelay Initial delay before first check in seconds
+   * @param jobId Job ID to wait for
+   * @param targetStatus Target status to wait for
+   * @param maxChecks Maximum number of checks
+   * @param checkInterval Check interval in seconds
+   * @param initialDelay Initial delay in seconds
    */
   waitForStatus(
     jobId: string,
