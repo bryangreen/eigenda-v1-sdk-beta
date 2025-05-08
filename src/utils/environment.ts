@@ -9,12 +9,12 @@ export const INITIAL_RETRIEVAL_DELAY = 300; // 5 minutes initial delay before fi
 
 /**
  * Validates the EigenDA client configuration.
- * @param {Object} config - The configuration object to validate
- * @param {string} [config.apiUrl] - The API URL
- * @param {string} [config.rpcUrl] - The RPC URL
- * @param {string} [config.privateKey] - The private key
- * @param {string} [config.creditsContractAddress] - The credits contract address
- * @returns {string[]} Array of validation error messages
+ * @param config - The configuration object to validate
+ * @param config.apiUrl - The API URL
+ * @param config.rpcUrl - The RPC URL
+ * @param config.privateKey - The private key
+ * @param config.creditsContractAddress - The credits contract address
+ * @returns Array of validation error messages
  */
 export const validateConfig = (config: {
   apiUrl?: string;
@@ -45,8 +45,8 @@ export const validateConfig = (config: {
 
 /**
  * Validates if a string is a valid URL.
- * @param {string} url - The URL to validate
- * @returns {boolean} True if URL is valid
+ * @param url - The URL to validate
+ * @returns True if URL is valid
  * @private
  */
 const isValidUrl = (url: string): boolean => {
@@ -60,8 +60,8 @@ const isValidUrl = (url: string): boolean => {
 
 /**
  * Validates if a string is a valid private key.
- * @param {string} key - The private key to validate
- * @returns {boolean} True if private key is valid
+ * @param key - The private key to validate
+ * @returns True if private key is valid
  * @private
  */
 const isValidPrivateKey = (key: string): boolean => {
@@ -71,8 +71,8 @@ const isValidPrivateKey = (key: string): boolean => {
 
 /**
  * Validates if a string is a valid Ethereum address.
- * @param {string} address - The address to validate
- * @returns {boolean} True if address is valid
+ * @param address - The address to validate
+ * @returns True if address is valid
  * @private
  */
 const isValidAddress = (address: string): boolean => {
