@@ -22,8 +22,7 @@ import {
   INITIAL_RETRIEVAL_DELAY,
   validateConfig
 } from '../utils/environment';
-import CreditsABI from '../../abis/v1/Credits.json';
-import { Log, LogDescription } from 'ethers';
+import { Credits } from './credits';
 
 export class EigenDAv1Client implements IEigenDAClient {
   private apiUrl: string;

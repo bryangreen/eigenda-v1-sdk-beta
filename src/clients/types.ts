@@ -33,38 +33,6 @@ export interface IEigenDAClient {
    * @param options Options for retrieving data
    */
   retrieve(options: RetrieveOptions): Promise<any>;
-
-  /**
-   * Gets the balance for a given identifier.
-   * @param identifier The identifier to check balance for
-   */
-  getBalance(identifier: Uint8Array): Promise<number>;
-
-  /**
-   * Tops up credits for a given identifier.
-   * @param identifier The identifier to top up credits for
-   * @param amountEth Amount of ETH to top up
-   */
-  topupCredits(
-    identifier: Uint8Array,
-    amountEth: number
-  ): Promise<{ transactionHash: string; status: string }>;
-
-  /**
-   * Creates a new identifier.
-   */
-  createIdentifier(): Promise<Uint8Array>;
-
-  /**
-   * Gets all identifiers for the current wallet address.
-   */
-  getIdentifiers(): Promise<Uint8Array[]>;
-
-  /**
-   * Gets the owner of a given identifier.
-   * @param identifier The identifier to check ownership for
-   */
-  getIdentifierOwner(identifier: Uint8Array): Promise<string>;
 }
 
 export interface EigenDAConfig {
@@ -129,5 +97,33 @@ export class ConfigurationError extends EigenDAError {
   constructor(message: string) {
     super(message);
     this.name = 'ConfigurationError';
+  }
+}
+
+// clients/v1/credits.ts
+export interface CreditsInterface {
+  createIdentifiers(): Promise<Uint8Array[]>;
+  getIdentifiers(): Promise<Uint8Array[]>;
+  getIdentifierOwner(identifier: Uint8Array): Promise<string>;
+  topUpCredits(identifier: Uint8Array, amountEth: number): Promise<{ transactionHash: string; status: string }>;
+  getBalance(identifier: Uint8Array): Promise<number>;
+}
+
+
+export class Credits implements CreditsInterface {
+  createIdentifiers(): Promise<Uint8Array[]> {
+    throw new Error("Method not implemented.");
+  }
+  getIdentifiers(): Promise<Uint8Array[]> {
+    throw new Error("Method not implemented.");
+  }
+  getIdentifierOwner(identifier: Uint8Array): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
+  topUpCredits(identifier: Uint8Array, amountEth: number): Promise<{ transactionHash: string; status: string }> {
+    throw new Error("Method not implemented.");
+  }
+  getBalance(identifier: Uint8Array): Promise<number> {
+    throw new Error("Method not implemented.");
   }
 }
