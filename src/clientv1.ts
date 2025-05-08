@@ -24,7 +24,7 @@ import {
 import CreditsABI from './contracts/Credits.json';
 import { Log, LogDescription } from 'ethers';
 
-export class EigenDAv1Client {
+export class EigenDAv1Client implements IEigenDAClient {
   private apiUrl: string;
   private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet;
