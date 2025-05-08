@@ -35,10 +35,24 @@ export interface IEigenDAClient {
   retrieve(options: RetrieveOptions): Promise<any>;
 }
 
+export interface IEigenCredits {
+  createIdentifier(): Promise<Uint8Array>;
+  getIdentifiers(): Promise<Uint8Array[]>;
+  getIdentifierOwner(identifier: Uint8Array): Promise<string>;
+  topupCredits(
+    identifier: Uint8Array,
+    amountEth: number
+  ): Promise<{ transactionHash: string; status: string }>;
+  getBalance(identifier: Uint8Array): Promise<number>;
+}
+
 export interface EigenDAConfig {
   apiUrl?: string;
   rpcUrl?: string;
   privateKey?: string;
+}
+
+export interface EigenCreditsConfig {
   creditsContractAddress?: string;
 }
 
@@ -97,33 +111,5 @@ export class ConfigurationError extends EigenDAError {
   constructor(message: string) {
     super(message);
     this.name = 'ConfigurationError';
-  }
-}
-
-// clients/v1/credits.ts
-export interface CreditsInterface {
-  createIdentifiers(): Promise<Uint8Array[]>;
-  getIdentifiers(): Promise<Uint8Array[]>;
-  getIdentifierOwner(identifier: Uint8Array): Promise<string>;
-  topUpCredits(identifier: Uint8Array, amountEth: number): Promise<{ transactionHash: string; status: string }>;
-  getBalance(identifier: Uint8Array): Promise<number>;
-}
-
-
-export class Credits implements CreditsInterface {
-  createIdentifiers(): Promise<Uint8Array[]> {
-    throw new Error("Method not implemented.");
-  }
-  getIdentifiers(): Promise<Uint8Array[]> {
-    throw new Error("Method not implemented.");
-  }
-  getIdentifierOwner(identifier: Uint8Array): Promise<string> {
-    throw new Error("Method not implemented.");
-  }
-  topUpCredits(identifier: Uint8Array, amountEth: number): Promise<{ transactionHash: string; status: string }> {
-    throw new Error("Method not implemented.");
-  }
-  getBalance(identifier: Uint8Array): Promise<number> {
-    throw new Error("Method not implemented.");
   }
 }
