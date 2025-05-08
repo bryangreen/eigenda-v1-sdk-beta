@@ -1,3 +1,12 @@
+import { Log, LogDescription } from 'ethers';
+import CreditsABI from '../../abis/v1/Credits.json';
+import { ethers } from 'ethers';
+import { EigenDAConfig, ConfigurationError, IEigenCredits } from '../types';
+import {
+  DEFAULT_CREDITS_CONTRACT_ADDRESS,
+  DEFAULT_RPC_URL,
+  validateConfig
+} from '../utils/environment';
 
 /**
  * Class for managing EigenDA credits and identifiers
