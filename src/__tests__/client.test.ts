@@ -1,5 +1,5 @@
 import { ConfigurationError, UploadError, RetrieveError } from '../clients/types';
-import { EigenDAv1Client } from '../clients/v1/client';
+import { EigenDAv1Client } from '../clients/v1/eigenda';
 import axios from 'axios';
 
 jest.mock('axios');
