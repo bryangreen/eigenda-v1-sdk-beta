@@ -1,4 +1,4 @@
-import { validateConfig } from '../utils/environment';
+import { validateConfig } from '../clients/utils/environment';
 
 describe('environment', () => {
   describe('validateConfig', () => {

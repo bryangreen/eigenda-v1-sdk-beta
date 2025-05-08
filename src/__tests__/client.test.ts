@@ -1,6 +1,6 @@
-import { EigenDAv1Client, ConfigurationError, UploadError, StatusError, RetrieveError } from '../';
+import { ConfigurationError, UploadError, RetrieveError } from '../clients/types';
+import { EigenDAv1Client } from '../clients/eigendav1';
 import axios from 'axios';
-import { Contract } from 'ethers';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;

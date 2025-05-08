@@ -1,4 +1,3 @@
-
 export interface IEigenDAClient {
   /**
    * Uploads content to EigenDA.

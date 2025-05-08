@@ -1,4 +1,3 @@
-
 export const DEFAULT_API_URL = 'https://test-agent-proxy-api.eigenda.xyz';
 export const DEFAULT_RPC_URL = 'https://mainnet.base.org';
 export const DEFAULT_CREDITS_CONTRACT_ADDRESS = '0x0CC001F1bDe9cd129092d4d24D935DB985Ce42A9';

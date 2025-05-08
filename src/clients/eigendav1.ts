@@ -1,4 +1,3 @@
-
 import { ethers } from 'ethers';
 import axios from 'axios';
 import { randomBytes } from 'crypto';
@@ -10,7 +9,8 @@ import {
   UploadError,
   RetrieveError,
   StatusError,
-  ConfigurationError
+  ConfigurationError,
+  IEigenDAClient
 } from './types';
 import {
   DEFAULT_API_URL,
@@ -21,7 +21,7 @@ import {
   INITIAL_RETRIEVAL_DELAY,
   validateConfig
 } from './utils/environment';
-import CreditsABI from './contracts/Credits.json';
+import CreditsABI from '../abis/v1/Credits.json';
 import { Log, LogDescription } from 'ethers';
 
 export class EigenDAv1Client implements IEigenDAClient {
