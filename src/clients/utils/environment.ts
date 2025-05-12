@@ -17,6 +17,7 @@ export const validateConfig = (config: {
   apiUrl?: string;
   rpcUrl?: string;
   privateKey?: string;
+  wallet?: ethers.Wallet;
   creditsContractAddress?: string;
 }) => {
   const errors: string[] = [];
@@ -31,6 +32,10 @@ export const validateConfig = (config: {
 
   if (config.privateKey && !isValidPrivateKey(config.privateKey)) {
     errors.push('Invalid private key format');
+  }
+
+  if (!config.privateKey && !config.wallet) {
+    errors.push('Invalid private key or wallet');
   }
 
   if (config.creditsContractAddress && !isValidAddress(config.creditsContractAddress)) {

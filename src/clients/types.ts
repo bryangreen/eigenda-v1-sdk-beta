@@ -1,4 +1,3 @@
-
 import { ethers } from 'ethers';
 
 /**
@@ -98,6 +97,9 @@ export interface EigenDAConfig {
   /** Private key for wallet */
   privateKey?: string;
   /** Ethers wallet instance */
+  /** If a wallet is not specified, then you must
+   *  specify the privateKey
+   */
   wallet?: ethers.Wallet;
   /** Credits contract address */
   creditsContractAddress?: string;

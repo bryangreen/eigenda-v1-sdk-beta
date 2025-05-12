@@ -1,4 +1,5 @@
-import { EigenDAv1Client } from '../src';
+import { ethers } from 'ethers';
+import { EigenDAv1Client, EigenCredits } from '../../src';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -6,41 +7,48 @@ dotenv.config();
 
 async function main() {
   try {
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY as string);
+
     // Initialize client with custom configuration
     const client = new EigenDAv1Client({
-      privateKey: process.env.PRIVATE_KEY,
+      wallet,
       apiUrl: process.env.API_URL,
-      rpcUrl: process.env.BASE_RPC_URL,
+      rpcUrl: process.env.BASE_RPC_URL
+    });
+
+    // Initialize EigenCredits with custom configuration
+    const credits = new EigenCredits({
+      wallet,
       creditsContractAddress: process.env.CREDITS_CONTRACT_ADDRESS
     });
 
     // Get or create an identifier
     console.log('Checking for existing identifiers...');
     let identifier;
-    const existingIdentifiers = await client.getIdentifiers();
-    
+    const existingIdentifiers = await credits.getIdentifiers();
+
     if (existingIdentifiers.length > 0) {
       identifier = existingIdentifiers[0];
       console.log('Using existing identifier:', Buffer.from(identifier).toString('hex'));
     } else {
       console.log('No existing identifier found. Creating new one...');
-      identifier = await client.createIdentifier();
+      identifier = await credits.createIdentifier();
       console.log('Created new identifier:', Buffer.from(identifier).toString('hex'));
     }
 
     // Check balance
     console.log('Checking balance...');
-    const balance = await client.getBalance(identifier);
+    const balance = await credits.getBalance(identifier);
     console.log('Balance:', balance, 'ETH');
 
     // Top up credits if balance is low
     if (balance < 0.001) {
       console.log('Balance is low. Topping up credits...');
-      const topupResult = await client.topupCredits(identifier, 0.001); // 0.001 ETH
+      const topupResult = await credits.topupCredits(identifier, 0.001); // 0.001 ETH
       console.log('Topup result:', topupResult);
-      
+
       // Verify new balance
-      const newBalance = await client.getBalance(identifier);
+      const newBalance = await credits.getBalance(identifier);
       console.log('New balance:', newBalance, 'ETH');
     }
 

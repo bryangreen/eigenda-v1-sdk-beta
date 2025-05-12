@@ -76,7 +76,7 @@ describe('EigenDAv1Client', () => {
       );
     });
 
-    it('should throw ConfigurationError when no private key provided', () => {
+    it('should throw ConfigurationError when no private key or wallet are provided', () => {
       expect(
         () =>
           new EigenDAv1Client({
