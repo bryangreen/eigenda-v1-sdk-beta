@@ -22,9 +22,17 @@ import {
 } from '../utils/environment';
 import { BaseWalletManager } from './base';
 
+/**
+ * Main client for interacting with EigenDA v1
+ */
 export class EigenDAv1Client extends BaseWalletManager implements IEigenDAClient {
   private apiUrl: string;
 
+  /**
+   * Creates a new EigenDAv1Client instance
+   * @param config - Optional configuration for EigenDA
+   * @throws {ConfigurationError} When configuration is invalid
+   */
   constructor(config?: EigenDAConfig) {
     const configErrors = validateConfig(config || {});
     if (configErrors.length > 0) {

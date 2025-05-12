@@ -9,9 +9,17 @@ import {
 } from '../utils/environment';
 import { BaseWalletManager } from './base';
 
+/**
+ * Manages EigenDA credits operations
+ */
 export class EigenCredits extends BaseWalletManager implements IEigenCredits {
   private creditsContract: ethers.Contract;
 
+  /**
+   * Creates a new EigenCredits instance
+   * @param config - Optional configuration for EigenDA
+   * @throws {ConfigurationError} When configuration is invalid
+   */
   constructor(config?: EigenDAConfig) {
     const configErrors = validateConfig(config || {});
     if (configErrors.length > 0) {
