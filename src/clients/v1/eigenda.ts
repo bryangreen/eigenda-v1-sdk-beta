@@ -20,65 +20,39 @@ import {
   INITIAL_RETRIEVAL_DELAY,
   validateConfig
 } from '../utils/environment';
+import { BaseWalletManager } from './base';
 
-/**
- * Client for interacting with EigenDA v1 API
- */
-export class EigenDAv1Client implements IEigenDAClient {
+export class EigenDAv1Client extends BaseWalletManager implements IEigenDAClient {
   private apiUrl: string;
-  private provider: ethers.JsonRpcProvider;
-  private wallet: ethers.Wallet;
 
-  /**
-   * Creates an instance of EigenDAv1Client
-   * @param config - Configuration object for the client
-   * @throws {ConfigurationError} When configuration is invalid
-   */
   constructor(config?: EigenDAConfig) {
     const configErrors = validateConfig(config || {});
     if (configErrors.length > 0) {
       throw new ConfigurationError(`Invalid configuration: ${configErrors.join(', ')}`);
     }
 
-    this.apiUrl = (config?.apiUrl || process.env.API_URL || DEFAULT_API_URL).replace(/\/$/, '');
     const rpcUrl = config?.rpcUrl || process.env.BASE_RPC_URL || DEFAULT_RPC_URL;
-    this.provider = new ethers.JsonRpcProvider(rpcUrl);
+    super(rpcUrl);
+
+    this.apiUrl = (config?.apiUrl || process.env.API_URL || DEFAULT_API_URL).replace(/\/$/, '');
 
     if (config?.wallet) {
-      this.wallet = config.wallet;
-    } else {
-      const privateKey = config?.privateKey || process.env.EIGENDA_PRIVATE_KEY;
-      if (!privateKey) {
-        throw new ConfigurationError(
-          'Private key not provided and EIGENDA_PRIVATE_KEY not set in environment'
-        );
-      }
-      const normalizedPrivateKey = privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`;
-      this.wallet = new ethers.Wallet(normalizedPrivateKey, this.provider);
+      this.setWallet(config.wallet);
+    } else if (config?.privateKey) {
+      const normalizedPrivateKey = config.privateKey.startsWith('0x') ? config.privateKey : `0x${config.privateKey}`;
+      this.setWallet(new ethers.Wallet(normalizedPrivateKey));
     }
   }
 
-  /**
-   * Signs a request payload
-   * @param requestData - Data to sign
-   * @returns Signature
-   */
   private async signRequest(requestData: any): Promise<string> {
     const dataToSign = {
       content: requestData.content,
       salt: requestData.salt
     };
     const message = JSON.stringify(dataToSign, Object.keys(dataToSign).sort());
-    return await this.wallet.signMessage(message);
+    return await this.getWallet().signMessage(message);
   }
 
-  /**
-   * Uploads content to EigenDA
-   * @param content - Content to upload
-   * @param identifier - Optional identifier for the upload
-   * @returns Upload response
-   * @throws {UploadError} When upload fails
-   */
   async upload(content: string, identifier?: Uint8Array): Promise<UploadResponse> {
     try {
       const salt = randomBytes(32).toString('hex');
@@ -95,7 +69,7 @@ export class EigenDAv1Client implements IEigenDAClient {
 
       const requestData = {
         content,
-        account_id: this.wallet.address,
+        account_id: this.getWallet().address,
         identifier: identifierHex,
         salt,
         signature
@@ -108,12 +82,6 @@ export class EigenDAv1Client implements IEigenDAClient {
     }
   }
 
-  /**
-   * Gets the status of an upload
-   * @param jobId - ID of the job to check
-   * @returns Status response
-   * @throws {StatusError} When status check fails
-   */
   async getStatus(jobId: string): Promise<StatusResponse> {
     try {
       const response = await axios.get<StatusResponse>(`${this.apiUrl}/status/${jobId}`);
@@ -123,16 +91,6 @@ export class EigenDAv1Client implements IEigenDAClient {
     }
   }
 
-  /**
-   * Waits for a specific status
-   * @param jobId - ID of the job to check
-   * @param targetStatus - Target status to wait for
-   * @param maxChecks - Maximum number of status checks
-   * @param checkInterval - Interval between checks in seconds
-   * @param initialDelay - Initial delay before first check in seconds
-   * @returns Status response
-   * @throws {StatusError} When status check fails or times out
-   */
   async waitForStatus(
     jobId: string,
     targetStatus: 'CONFIRMED' | 'FINALIZED' = 'CONFIRMED',
@@ -160,12 +118,6 @@ export class EigenDAv1Client implements IEigenDAClient {
     throw new StatusError(`Timeout waiting for status ${targetStatus} after ${maxChecks} checks`);
   }
 
-  /**
-   * Retrieves content from EigenDA
-   * @param options - Retrieval options
-   * @returns Retrieved content
-   * @throws {RetrieveError} When retrieval fails
-   */
   async retrieve(options: RetrieveOptions): Promise<any> {
     try {
       const { jobId, requestId, batchHeaderHash, blobIndex, waitForCompletion = false } = options;
