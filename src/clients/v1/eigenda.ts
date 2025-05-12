@@ -47,7 +47,9 @@ export class EigenDAv1Client extends BaseWalletManager implements IEigenDAClient
     if (config?.wallet) {
       this.setWallet(config.wallet);
     } else if (config?.privateKey) {
-      const normalizedPrivateKey = config.privateKey.startsWith('0x') ? config.privateKey : `0x${config.privateKey}`;
+      const normalizedPrivateKey = config.privateKey.startsWith('0x')
+        ? config.privateKey
+        : `0x${config.privateKey}`;
       this.setWallet(new ethers.Wallet(normalizedPrivateKey));
     }
   }

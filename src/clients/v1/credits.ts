@@ -32,7 +32,9 @@ export class EigenCredits extends BaseWalletManager implements IEigenCredits {
     if (config?.wallet) {
       this.setWallet(config.wallet);
     } else if (config?.privateKey) {
-      const normalizedPrivateKey = config.privateKey.startsWith('0x') ? config.privateKey : `0x${config.privateKey}`;
+      const normalizedPrivateKey = config.privateKey.startsWith('0x')
+        ? config.privateKey
+        : `0x${config.privateKey}`;
       this.setWallet(new ethers.Wallet(normalizedPrivateKey));
     }
 
@@ -40,7 +42,11 @@ export class EigenCredits extends BaseWalletManager implements IEigenCredits {
       config?.creditsContractAddress ||
       process.env.CREDITS_CONTRACT_ADDRESS ||
       DEFAULT_CREDITS_CONTRACT_ADDRESS;
-    this.creditsContract = new ethers.Contract(creditsContractAddress, CreditsABI.abi, this.getWallet());
+    this.creditsContract = new ethers.Contract(
+      creditsContractAddress,
+      CreditsABI.abi,
+      this.getWallet()
+    );
   }
 
   /**
@@ -64,7 +70,7 @@ export class EigenCredits extends BaseWalletManager implements IEigenCredits {
    * Tops up credits for a given identifier
    * @param identifier - The identifier to top up credits for
    * @param amountEth - The amount of ETH to top up
-   * @returns Transaction details including hash and status 
+   * @returns Transaction details including hash and status
    * @throws {Error} When the top up operation fails
    */
   async topupCredits(
