@@ -52,6 +52,12 @@ export class EigenDAv1Client extends BaseWalletManager implements IEigenDAClient
     }
   }
 
+  /**
+   * Signs a request with the wallet's private key
+   * @param requestData - The data to sign
+   * @returns The signature
+   * @private
+   */
   private async signRequest(requestData: any): Promise<string> {
     const dataToSign = {
       content: requestData.content,
@@ -61,6 +67,13 @@ export class EigenDAv1Client extends BaseWalletManager implements IEigenDAClient
     return await this.getWallet().signMessage(message);
   }
 
+  /**
+   * Uploads content to EigenDA
+   * @param content - The content to upload
+   * @param identifier - Optional identifier for the upload
+   * @returns Upload response containing jobId and requestId
+   * @throws {UploadError} When upload fails
+   */
   async upload(content: string, identifier?: Uint8Array): Promise<UploadResponse> {
     try {
       const salt = randomBytes(32).toString('hex');
@@ -90,6 +103,12 @@ export class EigenDAv1Client extends BaseWalletManager implements IEigenDAClient
     }
   }
 
+  /**
+   * Gets the status of an upload job
+   * @param jobId - The ID of the job to check
+   * @returns Status response containing current status and details
+   * @throws {StatusError} When status check fails
+   */
   async getStatus(jobId: string): Promise<StatusResponse> {
     try {
       const response = await axios.get<StatusResponse>(`${this.apiUrl}/status/${jobId}`);
@@ -99,6 +118,16 @@ export class EigenDAv1Client extends BaseWalletManager implements IEigenDAClient
     }
   }
 
+  /**
+   * Waits for a job to reach a specific status
+   * @param jobId - The ID of the job to wait for
+   * @param targetStatus - The target status to wait for
+   * @param maxChecks - Maximum number of status checks
+   * @param checkInterval - Interval between checks in seconds
+   * @param initialDelay - Initial delay before first check in seconds
+   * @returns Status response when target status is reached
+   * @throws {StatusError} When status check fails or times out
+   */
   async waitForStatus(
     jobId: string,
     targetStatus: 'CONFIRMED' | 'FINALIZED' = 'CONFIRMED',
@@ -126,6 +155,12 @@ export class EigenDAv1Client extends BaseWalletManager implements IEigenDAClient
     throw new StatusError(`Timeout waiting for status ${targetStatus} after ${maxChecks} checks`);
   }
 
+  /**
+   * Retrieves content from EigenDA
+   * @param options - Options for retrieval including jobId or requestId
+   * @returns Retrieved content
+   * @throws {RetrieveError} When retrieval fails
+   */
   async retrieve(options: RetrieveOptions): Promise<any> {
     try {
       const { jobId, requestId, batchHeaderHash, blobIndex, waitForCompletion = false } = options;

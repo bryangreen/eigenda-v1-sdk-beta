@@ -43,6 +43,12 @@ export class EigenCredits extends BaseWalletManager implements IEigenCredits {
     this.creditsContract = new ethers.Contract(creditsContractAddress, CreditsABI.abi, this.getWallet());
   }
 
+  /**
+   * Gets the credit balance for a given identifier
+   * @param identifier - The identifier to check the balance for
+   * @returns The balance in ETH
+   * @throws {Error} When the balance check fails
+   */
   async getBalance(identifier: Uint8Array): Promise<number> {
     try {
       const hexString = Buffer.from(identifier).toString('hex');
@@ -54,6 +60,13 @@ export class EigenCredits extends BaseWalletManager implements IEigenCredits {
     }
   }
 
+  /**
+   * Tops up credits for a given identifier
+   * @param identifier - The identifier to top up credits for
+   * @param amountEth - The amount of ETH to top up
+   * @returns Transaction details including hash and status 
+   * @throws {Error} When the top up operation fails
+   */
   async topupCredits(
     identifier: Uint8Array,
     amountEth: number
@@ -75,6 +88,11 @@ export class EigenCredits extends BaseWalletManager implements IEigenCredits {
     }
   }
 
+  /**
+   * Creates a new identifier for credits
+   * @returns The newly created identifier
+   * @throws {Error} When identifier creation fails
+   */
   async createIdentifier(): Promise<Uint8Array> {
     try {
       const tx = await this.creditsContract.createIdentifier();
@@ -95,6 +113,11 @@ export class EigenCredits extends BaseWalletManager implements IEigenCredits {
     }
   }
 
+  /**
+   * Gets all identifiers owned by the current wallet
+   * @returns Array of identifiers
+   * @throws {Error} When fetching identifiers fails
+   */
   async getIdentifiers(): Promise<Uint8Array[]> {
     try {
       const count = await this.creditsContract.getUserIdentifierCount(this.getWallet().address);
@@ -112,6 +135,12 @@ export class EigenCredits extends BaseWalletManager implements IEigenCredits {
     }
   }
 
+  /**
+   * Gets the owner address of a given identifier
+   * @param identifier - The identifier to check ownership for
+   * @returns The owner's address
+   * @throws {Error} When fetching owner fails
+   */
   async getIdentifierOwner(identifier: Uint8Array): Promise<string> {
     try {
       const hexString = Buffer.from(identifier).toString('hex');
