@@ -22,16 +22,31 @@ Need higher limits or credits for student/indie projects? Contact us
 
 ```typescript
 import { EigenDAv1Client, EigenCredits } from 'eigenda-sdk';
+import { ethers } from 'ethers';
 
-// Initialize the client and credits manager
+// Option 1: Initialize with private key
 const client = new EigenDAv1Client({
-  apiUrl: 'YOUR_API_URL',  // Optional: defaults to mainnet
-  rpcUrl: 'YOUR_RPC_URL',  // Optional: defaults to mainnet
-  privateKey: 'YOUR_PRIVATE_KEY'
+  privateKey: 'YOUR_PRIVATE_KEY',  // Either privateKey or wallet is required
+  apiUrl: 'YOUR_API_URL',         // Optional: defaults to test API URL
+  rpcUrl: 'YOUR_RPC_URL'          // Optional: defaults to Base mainnet
 });
 
 const credits = new EigenCredits({
-  privateKey: 'YOUR_PRIVATE_KEY'
+  privateKey: 'YOUR_PRIVATE_KEY',  // Either privateKey or wallet is required
+  creditsContractAddress: 'YOUR_CONTRACT_ADDRESS'  // Optional: defaults to mainnet address
+});
+
+// Option 2: Initialize with wallet
+const wallet = new ethers.Wallet('YOUR_PRIVATE_KEY');
+const clientWithWallet = new EigenDAv1Client({
+  wallet,                         // Either wallet or privateKey is required
+  apiUrl: 'YOUR_API_URL',        // Optional: defaults to test API URL
+  rpcUrl: 'YOUR_RPC_URL'         // Optional: defaults to Base mainnet
+});
+
+const creditsWithWallet = new EigenCredits({
+  wallet,                         // Either wallet or privateKey is required
+  creditsContractAddress: 'YOUR_CONTRACT_ADDRESS'  // Optional: defaults to mainnet address
 });
 
 // Create an identifier for managing credits
