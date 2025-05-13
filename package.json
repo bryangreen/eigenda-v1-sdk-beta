@@ -1,6 +1,6 @@
 {
   "name": "eigenda-sdk-dev",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Developer-friendly SDK for interacting with EigenDA proxy",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
