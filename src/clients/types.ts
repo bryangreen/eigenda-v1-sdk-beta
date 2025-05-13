@@ -45,48 +45,6 @@ export interface IEigenDAClient {
 }
 
 /**
- * Interface for managing EigenDA credits
- */
-export interface IEigenCredits {
-  /**
-   * Creates a new identifier for credits
-   * @returns Promise containing new identifier
-   */
-  createIdentifier(): Promise<Uint8Array>;
-
-  /**
-   * Gets all identifiers owned by the current wallet
-   * @returns Promise containing array of identifiers
-   */
-  getIdentifiers(): Promise<Uint8Array[]>;
-
-  /**
-   * Gets the owner of an identifier
-   * @param identifier - Identifier to check ownership for
-   * @returns Promise containing owner's address
-   */
-  getIdentifierOwner(identifier: Uint8Array): Promise<string>;
-
-  /**
-   * Tops up credits for an identifier
-   * @param identifier - Identifier to top up credits for
-   * @param amountEth - Amount of ETH to top up
-   * @returns Promise containing transaction details
-   */
-  topupCredits(
-    identifier: Uint8Array,
-    amountEth: number
-  ): Promise<{ transactionHash: string; status: string }>;
-
-  /**
-   * Gets the credit balance for an identifier
-   * @param identifier - Identifier to check balance for
-   * @returns Promise containing balance in ETH
-   */
-  getBalance(identifier: Uint8Array): Promise<number>;
-}
-
-/**
  * Configuration options for EigenDA client
  */
 export interface EigenDAConfig {
@@ -196,4 +154,47 @@ export class ConfigurationError extends EigenDAError {
     super(message);
     this.name = 'ConfigurationError';
   }
+}
+
+
+/**
+ * Interface for managing EigenDA credits
+ */
+export interface IEigenCredits {
+  /**
+   * Creates a new identifier for credits
+   * @returns Promise containing new identifier
+   */
+  createIdentifier(): Promise<Uint8Array>;
+
+  /**
+   * Gets all identifiers owned by the current wallet
+   * @returns Promise containing array of identifiers
+   */
+  getIdentifiers(): Promise<Uint8Array[]>;
+
+  /**
+   * Gets the owner of an identifier
+   * @param identifier - Identifier to check ownership for
+   * @returns Promise containing owner's address
+   */
+  getIdentifierOwner(identifier: Uint8Array): Promise<string>;
+
+  /**
+   * Tops up credits for an identifier
+   * @param identifier - Identifier to top up credits for
+   * @param amountEth - Amount of ETH to top up
+   * @returns Promise containing transaction details
+   */
+  topupCredits(
+    identifier: Uint8Array,
+    amountEth: number
+  ): Promise<{ transactionHash: string; status: string }>;
+
+  /**
+   * Gets the credit balance for an identifier
+   * @param identifier - Identifier to check balance for
+   * @returns Promise containing balance in ETH
+   */
+  getBalance(identifier: Uint8Array): Promise<number>;
 }

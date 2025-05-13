@@ -3,7 +3,7 @@
 
 A developer-friendly TypeScript/JavaScript SDK for interacting with EigenDA proxy. This SDK simplifies the process of storing and retrieving data using EigenDA's data availability solution.
 
-> **Note**: This SDK currently supports EigenDA v1. Support for EigenDA v2 is coming soon!
+> **Note**: This SDK currently supports EigenDA v1. Support for EigenDA v2 is coming soon! Also, this SDK works with an experimental EigenDA "Credits" system. This will be replaced in future versions. 
 
 ## Installation
 
@@ -24,7 +24,7 @@ Need higher limits or credits for student/indie projects? Contact us
 import { EigenDAv1Client, EigenCredits } from 'eigenda-sdk';
 import { ethers } from 'ethers';
 
-// Option 1: Initialize with private key
+// Option 1a: Initialize with private key -or-
 const client = new EigenDAv1Client({
   privateKey: 'YOUR_PRIVATE_KEY',  // Either privateKey or wallet is required
   apiUrl: 'YOUR_API_URL',         // Optional: defaults to test API URL
@@ -36,7 +36,7 @@ const credits = new EigenCredits({
   creditsContractAddress: 'YOUR_CONTRACT_ADDRESS'  // Optional: defaults to mainnet address
 });
 
-// Option 2: Initialize with wallet
+// Option 1b: Initialize with wallet
 const wallet = new ethers.Wallet('YOUR_PRIVATE_KEY');
 const clientWithWallet = new EigenDAv1Client({
   wallet,                         // Either wallet or privateKey is required
@@ -71,6 +71,8 @@ console.log('Retrieved Data:', data);
 
 ## Features
 
+- Separate clients for EigenDA v1 or v2
+- Ability to work directly with Credits or EigenDA
 - Simple and intuitive API
 - TypeScript support
 - Comprehensive error handling
@@ -91,7 +93,7 @@ new EigenDAv1Client(config?: {
   apiUrl?: string;
   rpcUrl?: string;
   privateKey?: string;
-  creditsContractAddress?: string;
+  wallet?: ethers.Wallet;
 })
 ```
 
@@ -115,6 +117,7 @@ Class for managing EigenDA credits and identifiers.
 ```typescript
 new EigenCredits(config?: {
   privateKey?: string;
+  wallet?: ethers.Wallet;
   creditsContractAddress?: string;
 })
 ```
