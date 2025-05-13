@@ -156,7 +156,6 @@ export class ConfigurationError extends EigenDAError {
   }
 }
 
-
 /**
  * Interface for managing EigenDA credits
  */

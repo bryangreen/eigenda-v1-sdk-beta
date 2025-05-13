@@ -58,8 +58,11 @@ export class EigenCredits extends BaseWalletManager implements IEigenCredits {
   async getBalance(identifier: Uint8Array): Promise<number> {
     try {
       const hexString = Buffer.from(identifier).toString('hex');
+      console.log('Formatted Identifier hex:', hexString);
       const formattedIdentifier = ethers.hexlify(ethers.zeroPadValue('0x' + hexString, 32));
+      console.log('Formatted Identifier:', formattedIdentifier);
       const balance = await this.creditsContract.getBalance(formattedIdentifier);
+      console.log('Balance:', balance);
       return Number(ethers.formatEther(balance));
     } catch (error: any) {
       throw new Error(`Failed to get balance: ${error.message}`);
