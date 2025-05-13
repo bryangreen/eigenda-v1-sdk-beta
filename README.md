@@ -1,6 +1,9 @@
+
 # EigenDA SDK
 
 A developer-friendly TypeScript/JavaScript SDK for interacting with EigenDA proxy. This SDK simplifies the process of storing and retrieving data using EigenDA's data availability solution.
+
+> **Note**: This SDK currently supports EigenDA v1. Support for EigenDA v2 is coming soon!
 
 ## Installation
 
@@ -18,17 +21,28 @@ Need higher limits or credits for student/indie projects? Contact us
 ## Quick Start
 
 ```typescript
-import { EigenDAClient } from 'eigenda-sdk';
+import { EigenDAv1Client, EigenCredits } from 'eigenda-sdk';
 
-// Initialize the client
-const client = new EigenDAClient({
+// Initialize the client and credits manager
+const client = new EigenDAv1Client({
   apiUrl: 'YOUR_API_URL',  // Optional: defaults to mainnet
   rpcUrl: 'YOUR_RPC_URL',  // Optional: defaults to mainnet
   privateKey: 'YOUR_PRIVATE_KEY'
 });
 
-// Upload data
-const uploadResult = await client.upload('Hello EigenDA!');
+const credits = new EigenCredits({
+  privateKey: 'YOUR_PRIVATE_KEY'
+});
+
+// Create an identifier for managing credits
+const identifier = await credits.createIdentifier();
+console.log('Created identifier:', Buffer.from(identifier).toString('hex'));
+
+// Top up credits
+await credits.topupCredits(identifier, 0.015); // 0.015 ETH
+
+// Upload data using the identifier
+const uploadResult = await client.upload('Hello EigenDA!', identifier);
 console.log('Upload Job ID:', uploadResult.jobId);
 
 // Check status
@@ -51,14 +65,14 @@ console.log('Retrieved Data:', data);
 
 ## API Reference
 
-### `EigenDAClient`
+### `EigenDAv1Client`
 
-The main class for interacting with EigenDA.
+The main class for interacting with EigenDA v1.
 
 #### Constructor
 
 ```typescript
-new EigenDAClient(config?: {
+new EigenDAv1Client(config?: {
   apiUrl?: string;
   rpcUrl?: string;
   privateKey?: string;
@@ -77,11 +91,35 @@ Check the status of an upload.
 ##### `retrieve(options: RetrieveOptions): Promise<any>`
 Retrieve data from EigenDA.
 
-##### `getBalance(identifier: Uint8Array): Promise<number>`
-Get the credit balance for an identifier.
+### `EigenCredits`
+
+Class for managing EigenDA credits and identifiers.
+
+#### Constructor
+
+```typescript
+new EigenCredits(config?: {
+  privateKey?: string;
+  creditsContractAddress?: string;
+})
+```
+
+#### Methods
+
+##### `createIdentifier(): Promise<Uint8Array>`
+Creates a new identifier for managing credits.
+
+##### `getIdentifiers(): Promise<Uint8Array[]>`
+Gets all identifiers owned by the current wallet.
+
+##### `getIdentifierOwner(identifier: Uint8Array): Promise<string>`
+Gets the owner address of a given identifier.
 
 ##### `topupCredits(identifier: Uint8Array, amountEth: number): Promise<{ transactionHash: string; status: string }>`
-Add credits to an identifier.
+Adds credits to an identifier.
+
+##### `getBalance(identifier: Uint8Array): Promise<number>`
+Gets the credit balance for an identifier.
 
 ## Error Handling
 
